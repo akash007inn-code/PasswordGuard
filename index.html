@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>PasswordGuard | Password Strength Analyzer</title>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <!-- BACKGROUND -->
+
+    <div class="background">
+        <div class="grid"></div>
+        <div class="glow glow-one"></div>
+        <div class="glow glow-two"></div>
+    </div>
+
+
+    <!-- HEADER -->
+
+    <header>
+
+        <div class="logo">
+            <span class="logo-symbol">◈</span>
+            PasswordGuard
+        </div>
+
+        <div class="status">
+            <span class="status-dot"></span>
+            Security Analyzer
+        </div>
+
+    </header>
+
+
+    <!-- MAIN -->
+
+    <main>
+
+        <!-- HERO -->
+
+        <section class="hero">
+
+            <div class="badge">
+                🔐 CYBERSECURITY TOOL
+            </div>
+
+            <h1>
+                Password Strength
+                <br>
+                <span>Analyzer</span>
+            </h1>
+
+            <p>
+                Analyze your password security and discover
+                how strong your password really is.
+            </p>
+
+        </section>
+
+
+        <!-- ANALYZER -->
+
+        <section class="analyzer">
+
+            <!-- PASSWORD -->
+
+            <div class="input-card">
+
+                <label for="password">
+                    ENTER YOUR PASSWORD
+                </label>
+
+                <div class="password-box">
+
+                    <input
+                        type="password"
+                        id="password"
+                        placeholder="Enter password..."
+                        autocomplete="off"
+                    >
+
+                    <button
+                        id="togglePassword"
+                        type="button"
+                    >
+                        👁
+                    </button>
+
+                </div>
+
+
+                <!-- STRENGTH BAR -->
+
+                <div class="meter">
+                    <div id="strengthBar"></div>
+                </div>
+
+
+                <div class="strength-info">
+
+                    <span>
+                        Password strength
+                    </span>
+
+                    <strong id="strengthText">
+                        Waiting...
+                    </strong>
+
+                </div>
+
+            </div>
+
+
+            <!-- RESULTS -->
+
+            <div class="result-grid">
+
+
+                <!-- SCORE CARD -->
+
+                <div class="score-card">
+
+                    <div class="card-header">
+
+                        <div>
+
+                            <div class="card-title">
+                                SECURITY SCORE
+                            </div>
+
+                            <span class="card-subtitle">
+                                Overall password security
+                            </span>
+
+                        </div>
+
+                        <div class="shield-icon">
+                            🛡
+                        </div>
+
+                    </div>
+
+
+                    <div class="score-circle">
+
+                        <div class="score-content">
+
+                            <strong id="score">
+                                0
+                            </strong>
+
+                            <small>
+                                /100
+                            </small>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="security-status">
+
+                        <span
+                            class="status-indicator"
+                            id="statusIndicator"
+                        ></span>
+
+                        <strong id="securityLevel">
+                            WAITING
+                        </strong>
+
+                    </div>
+
+
+                    <p
+                        class="score-message"
+                        id="scoreMessage"
+                    >
+                        Enter a password to begin analysis.
+                    </p>
+
+
+                    <div class="score-stats">
+
+                        <div class="stat">
+
+                            <span>
+                                Complexity
+                            </span>
+
+                            <strong id="complexity">
+                                --
+                            </strong>
+
+                        </div>
+
+
+                        <div class="stat">
+
+                            <span>
+                                Length
+                            </span>
+
+                            <strong id="passwordLength">
+                                0
+                            </strong>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- REQUIREMENTS -->
+
+                <div class="requirements">
+
+                    <div class="card-header">
+
+                        <div>
+
+                            <div class="card-title">
+                                PASSWORD REQUIREMENTS
+                            </div>
+
+                            <span class="card-subtitle">
+                                Security criteria
+                            </span>
+
+                        </div>
+
+
+                        <div class="requirement-count">
+
+                            <span id="requirementCount">
+                                0
+                            </span>
+
+                            /6
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- LENGTH -->
+
+                    <div
+                        class="requirement"
+                        id="length"
+                    >
+
+                        <span class="check">
+                            ✓
+                        </span>
+
+                        <div class="requirement-info">
+
+                            <strong>
+                                At least 8 characters
+                            </strong>
+
+                            <span>
+                                Minimum password length
+                            </span>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- UPPERCASE -->
+
+                    <div
+                        class="requirement"
+                        id="uppercase"
+                    >
+
+                        <span class="check">
+                            ✓
+                        </span>
+
+                        <div class="requirement-info">
+
+                            <strong>
+                                Uppercase letter
+                            </strong>
+
+                            <span>
+                                Contains A–Z
+                            </span>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- LOWERCASE -->
+
+                    <div
+                        class="requirement"
+                        id="lowercase"
+                    >
+
+                        <span class="check">
+                            ✓
+                        </span>
+
+                        <div class="requirement-info">
+
+                            <strong>
+                                Lowercase letter
+                            </strong>
+
+                            <span>
+                                Contains a–z
+                            </span>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- NUMBER -->
+
+                    <div
+                        class="requirement"
+                        id="number"
+                    >
+
+                        <span class="check">
+                            ✓
+                        </span>
+
+                        <div class="requirement-info">
+
+                            <strong>
+                                Number
+                            </strong>
+
+                            <span>
+                                Contains 0–9
+                            </span>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- SPECIAL -->
+
+                    <div
+                        class="requirement"
+                        id="special"
+                    >
+
+                        <span class="check">
+                            ✓
+                        </span>
+
+                        <div class="requirement-info">
+
+                            <strong>
+                                Special character
+                            </strong>
+
+                            <span>
+                                Contains ! @ # $ % etc.
+                            </span>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- SPACES -->
+
+                    <div
+                        class="requirement"
+                        id="space"
+                    >
+
+                        <span class="check">
+                            ✓
+                        </span>
+
+                        <div class="requirement-info">
+
+                            <strong>
+                                No spaces
+                            </strong>
+
+                            <span>
+                                Password contains no spaces
+                            </span>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- PRIVACY -->
+
+        <div class="privacy">
+
+            🔒
+
+            <strong>
+                Privacy First
+            </strong>
+
+            — Your password is analyzed locally in your
+            browser and is never stored.
+
+        </div>
+
+    </main>
+
+
+    <!-- FOOTER -->
+
+    <footer>
+
+        © 2026 PasswordGuard
+        • Cybersecurity Learning Project
+
+    </footer>
+
+
+    <!-- JAVASCRIPT -->
+
+    <script src="script.js"></script>
+
+</body>
+</html>
