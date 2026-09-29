@@ -1,0 +1,1613 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>PasswordGuard | Password Strength Analyzer</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            background: #050810;
+            color: #ffffff;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* BACKGROUND */
+
+        .background {
+            position: fixed;
+            inset: 0;
+            overflow: hidden;
+            z-index: -1;
+        }
+
+        .grid {
+            position: absolute;
+            inset: 0;
+
+            background-image:
+                linear-gradient(
+                    rgba(255,255,255,0.025) 1px,
+                    transparent 1px
+                ),
+                linear-gradient(
+                    90deg,
+                    rgba(255,255,255,0.025) 1px,
+                    transparent 1px
+                );
+
+            background-size: 50px 50px;
+        }
+
+        .glow {
+            position: absolute;
+            width: 450px;
+            height: 450px;
+            border-radius: 50%;
+            filter: blur(130px);
+            opacity: 0.13;
+        }
+
+        .glow-one {
+            background: #00e5ff;
+            top: -180px;
+            left: -150px;
+        }
+
+        .glow-two {
+            background: #7c3aed;
+            right: -150px;
+            bottom: -180px;
+        }
+
+        /* HEADER */
+
+        header {
+            width: 90%;
+            max-width: 1150px;
+            margin: auto;
+
+            padding: 25px 0;
+
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 22px;
+            font-weight: bold;
+            letter-spacing: 1px;
+        }
+
+        .logo-symbol {
+            color: #00e5ff;
+            margin-right: 8px;
+        }
+
+        .status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+
+            color: #64748b;
+            font-size: 13px;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+
+            border-radius: 50%;
+            background: #22c55e;
+
+            box-shadow: 0 0 12px #22c55e;
+        }
+
+        /* MAIN */
+
+        main {
+            width: 90%;
+            max-width: 1050px;
+            margin: auto;
+        }
+
+        /* HERO */
+
+        .hero {
+            text-align: center;
+            padding: 65px 20px 45px;
+        }
+
+        .badge {
+            display: inline-block;
+
+            padding: 8px 16px;
+
+            border: 1px solid rgba(0,229,255,0.25);
+
+            background: rgba(0,229,255,0.07);
+
+            color: #00e5ff;
+
+            border-radius: 30px;
+
+            font-size: 11px;
+
+            letter-spacing: 1.8px;
+
+            margin-bottom: 20px;
+        }
+
+        .hero h1 {
+            font-size: clamp(42px, 6vw, 72px);
+
+            line-height: 1.02;
+
+            letter-spacing: -3px;
+        }
+
+        .hero h1 span {
+            color: #00e5ff;
+
+            text-shadow:
+                0 0 30px rgba(0,229,255,0.2);
+        }
+
+        .hero p {
+            max-width: 600px;
+
+            margin: 20px auto 0;
+
+            color: #64748b;
+
+            line-height: 1.7;
+
+            font-size: 15px;
+        }
+
+        /* ANALYZER */
+
+        .analyzer {
+            background:
+                linear-gradient(
+                    145deg,
+                    rgba(15,23,42,0.82),
+                    rgba(2,6,23,0.92)
+                );
+
+            border: 1px solid rgba(148,163,184,0.09);
+
+            border-radius: 25px;
+
+            padding: 30px;
+
+            backdrop-filter: blur(20px);
+
+            box-shadow:
+                0 30px 100px rgba(0,0,0,0.45);
+        }
+
+        /* PASSWORD INPUT */
+
+        .input-card label {
+            display: block;
+
+            color: #94a3b8;
+
+            font-size: 11px;
+
+            font-weight: bold;
+
+            letter-spacing: 1.6px;
+
+            margin-bottom: 12px;
+        }
+
+        .password-box {
+            display: flex;
+            align-items: center;
+
+            background: #070b14;
+
+            border: 1px solid #1e293b;
+
+            border-radius: 14px;
+
+            padding: 5px;
+
+            transition: 0.3s;
+        }
+
+        .password-box:focus-within {
+            border-color: #00e5ff;
+
+            box-shadow:
+                0 0 25px rgba(0,229,255,0.1);
+        }
+
+        .password-box input {
+            flex: 1;
+
+            background: transparent;
+
+            border: none;
+
+            outline: none;
+
+            color: white;
+
+            padding: 15px;
+
+            font-size: 16px;
+        }
+
+        .password-box input::placeholder {
+            color: #475569;
+        }
+
+        .password-box button {
+            border: none;
+
+            background: #111827;
+
+            color: white;
+
+            border-radius: 10px;
+
+            padding: 12px 15px;
+
+            cursor: pointer;
+
+            font-size: 16px;
+
+            transition: 0.2s;
+        }
+
+        .password-box button:hover {
+            background: #1e293b;
+        }
+
+        /* STRENGTH BAR */
+
+        .meter {
+            height: 6px;
+
+            background: #111827;
+
+            border-radius: 10px;
+
+            margin-top: 15px;
+
+            overflow: hidden;
+        }
+
+        #strengthBar {
+            height: 100%;
+
+            width: 0%;
+
+            background: #334155;
+
+            border-radius: 10px;
+
+            transition:
+                width 0.45s ease,
+                background 0.3s ease;
+        }
+
+        .strength-info {
+            display: flex;
+
+            justify-content: space-between;
+
+            margin-top: 10px;
+
+            color: #475569;
+
+            font-size: 12px;
+        }
+
+        #strengthText {
+            color: #64748b;
+        }
+
+        /* RESULT GRID */
+
+        .result-grid {
+            display: grid;
+
+            grid-template-columns: 0.9fr 1.5fr;
+
+            gap: 20px;
+
+            margin-top: 25px;
+        }
+
+        /* CARDS */
+
+        .score-card,
+        .requirements {
+            position: relative;
+
+            background:
+                linear-gradient(
+                    145deg,
+                    rgba(15,23,42,0.9),
+                    rgba(3,7,18,0.96)
+                );
+
+            border: 1px solid rgba(148,163,184,0.1);
+
+            border-radius: 22px;
+
+            padding: 26px;
+
+            overflow: hidden;
+        }
+
+        .score-card::before,
+        .requirements::before {
+            content: "";
+
+            position: absolute;
+
+            width: 180px;
+            height: 180px;
+
+            border-radius: 50%;
+
+            background: rgba(0,229,255,0.06);
+
+            filter: blur(50px);
+
+            top: -90px;
+            right: -70px;
+
+            pointer-events: none;
+        }
+
+        /* CARD HEADER */
+
+        .card-header {
+            display: flex;
+
+            justify-content: space-between;
+
+            align-items: flex-start;
+
+            margin-bottom: 8px;
+        }
+
+        .card-title {
+            color: #94a3b8;
+
+            font-size: 11px;
+
+            font-weight: bold;
+
+            letter-spacing: 1.6px;
+        }
+
+        .card-subtitle {
+            display: block;
+
+            color: #475569;
+
+            font-size: 11px;
+
+            margin-top: 5px;
+        }
+
+        .shield-icon {
+            width: 40px;
+            height: 40px;
+
+            display: flex;
+
+            justify-content: center;
+            align-items: center;
+
+            border-radius: 12px;
+
+            background: rgba(0,229,255,0.07);
+
+            border: 1px solid rgba(0,229,255,0.12);
+
+            font-size: 18px;
+        }
+
+        /* SCORE CIRCLE */
+
+        .score-circle {
+            width: 180px;
+            height: 180px;
+
+            margin: 28px auto 18px;
+
+            border-radius: 50%;
+
+            display: flex;
+
+            justify-content: center;
+            align-items: center;
+
+            position: relative;
+
+            background:
+                radial-gradient(
+                    circle,
+                    #080d19 57%,
+                    transparent 58%
+                );
+
+            border: 9px solid #172033;
+
+            box-shadow:
+                0 0 40px rgba(0,229,255,0.06);
+        }
+
+        .score-circle::before {
+            content: "";
+
+            position: absolute;
+
+            inset: -9px;
+
+            border-radius: 50%;
+
+            border: 9px solid transparent;
+
+            border-top-color: #00e5ff;
+
+            border-right-color: #00e5ff;
+
+            transform: rotate(-45deg);
+
+            transition: 0.6s ease;
+
+            filter:
+                drop-shadow(
+                    0 0 8px rgba(0,229,255,0.4)
+                );
+        }
+
+        .score-content {
+            position: relative;
+
+            z-index: 2;
+
+            display: flex;
+
+            align-items: baseline;
+        }
+
+        .score-content strong {
+            font-size: 48px;
+
+            letter-spacing: -2px;
+        }
+
+        .score-content small {
+            color: #475569;
+
+            font-size: 13px;
+
+            margin-left: 4px;
+        }
+
+        /* SECURITY STATUS */
+
+        .security-status {
+            display: flex;
+
+            justify-content: center;
+            align-items: center;
+
+            gap: 8px;
+
+            margin-top: 5px;
+        }
+
+        .security-status strong {
+            color: #64748b;
+
+            font-size: 13px;
+
+            letter-spacing: 1.5px;
+
+            text-transform: uppercase;
+        }
+
+        .status-indicator {
+            width: 8px;
+            height: 8px;
+
+            border-radius: 50%;
+
+            background: #64748b;
+        }
+
+        /* SCORE MESSAGE */
+
+        .score-message {
+            text-align: center;
+
+            color: #64748b;
+
+            font-size: 12px;
+
+            line-height: 1.6;
+
+            margin: 12px auto 20px;
+
+            max-width: 300px;
+        }
+
+        /* STATS */
+
+        .score-stats {
+            display: grid;
+
+            grid-template-columns: 1fr 1fr;
+
+            gap: 10px;
+        }
+
+        .stat {
+            background: rgba(15,23,42,0.8);
+
+            border: 1px solid rgba(255,255,255,0.05);
+
+            border-radius: 12px;
+
+            padding: 12px;
+        }
+
+        .stat span {
+            display: block;
+
+            color: #475569;
+
+            font-size: 9px;
+
+            text-transform: uppercase;
+
+            letter-spacing: 1px;
+
+            margin-bottom: 5px;
+        }
+
+        .stat strong {
+            color: #e2e8f0;
+
+            font-size: 14px;
+        }
+
+        /* REQUIREMENT COUNT */
+
+        .requirement-count {
+            padding: 7px 11px;
+
+            border-radius: 20px;
+
+            background: rgba(0,229,255,0.07);
+
+            border: 1px solid rgba(0,229,255,0.1);
+
+            color: #64748b;
+
+            font-size: 12px;
+        }
+
+        .requirement-count span {
+            color: #00e5ff;
+
+            font-weight: bold;
+        }
+
+        /* REQUIREMENTS */
+
+        .requirement {
+            display: flex;
+
+            align-items: center;
+
+            gap: 14px;
+
+            padding: 13px 10px;
+
+            border-bottom:
+                1px solid rgba(255,255,255,0.05);
+
+            color: #64748b;
+
+            transition:
+                background 0.25s ease,
+                transform 0.25s ease;
+        }
+
+        .requirement:last-child {
+            border-bottom: none;
+        }
+
+        .requirement:hover {
+            background: rgba(255,255,255,0.025);
+
+            transform: translateX(3px);
+        }
+
+        /* CHECK */
+
+        .check {
+            width: 32px;
+            height: 32px;
+
+            min-width: 32px;
+
+            display: flex;
+
+            align-items: center;
+            justify-content: center;
+
+            border-radius: 10px;
+
+            background: #0f172a;
+
+            border: 1px solid #1e293b;
+
+            color: #475569;
+
+            font-size: 13px;
+
+            transition: 0.25s;
+        }
+
+        .requirement-info {
+            display: flex;
+
+            flex-direction: column;
+
+            gap: 3px;
+        }
+
+        .requirement-info strong {
+            color: #94a3b8;
+
+            font-size: 13px;
+        }
+
+        .requirement-info span {
+            color: #475569;
+
+            font-size: 10px;
+        }
+
+        /* VALID */
+
+        .requirement.valid .check {
+            background: rgba(34,197,94,0.12);
+
+            border-color: rgba(34,197,94,0.18);
+
+            color: #22c55e;
+
+            box-shadow:
+                0 0 12px rgba(34,197,94,0.08);
+        }
+
+        .requirement.valid .requirement-info strong {
+            color: #e2e8f0;
+        }
+
+        /* PRIVACY */
+
+        .privacy {
+            text-align: center;
+
+            margin: 25px 0;
+
+            padding: 15px;
+
+            border: 1px solid rgba(34,197,94,0.12);
+
+            background: rgba(34,197,94,0.025);
+
+            border-radius: 12px;
+
+            color: #64748b;
+
+            font-size: 12px;
+        }
+
+        .privacy strong {
+            color: #22c55e;
+        }
+
+        /* FOOTER */
+
+        footer {
+            text-align: center;
+
+            padding: 30px;
+
+            color: #334155;
+
+            font-size: 11px;
+        }
+
+        /* RESPONSIVE */
+
+        @media (max-width: 750px) {
+
+            header {
+                width: 92%;
+            }
+
+            .status {
+                display: none;
+            }
+
+            .hero {
+                padding-top: 40px;
+            }
+
+            .hero h1 {
+                font-size: 44px;
+            }
+
+            .analyzer {
+                padding: 20px;
+            }
+
+            .result-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .score-circle {
+                width: 165px;
+                height: 165px;
+            }
+
+            .score-content strong {
+                font-size: 43px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- BACKGROUND -->
+
+    <div class="background">
+        <div class="grid"></div>
+        <div class="glow glow-one"></div>
+        <div class="glow glow-two"></div>
+    </div>
+
+
+    <!-- HEADER -->
+
+    <header>
+
+        <div class="logo">
+            <span class="logo-symbol">◈</span>
+            PasswordGuard
+        </div>
+
+        <div class="status">
+            <span class="status-dot"></span>
+            Security Analyzer
+        </div>
+
+    </header>
+
+
+    <!-- MAIN -->
+
+    <main>
+
+        <!-- HERO -->
+
+        <section class="hero">
+
+            <div class="badge">
+                🔐 CYBERSECURITY TOOL
+            </div>
+
+            <h1>
+                Password Strength
+                <br>
+                <span>Analyzer</span>
+            </h1>
+
+            <p>
+                Analyze your password security and discover
+                how strong your password really is.
+            </p>
+
+        </section>
+
+
+        <!-- ANALYZER -->
+
+        <section class="analyzer">
+
+            <!-- PASSWORD -->
+
+            <div class="input-card">
+
+                <label for="password">
+                    ENTER YOUR PASSWORD
+                </label>
+
+                <div class="password-box">
+
+                    <input
+                        type="password"
+                        id="password"
+                        placeholder="Enter password..."
+                        autocomplete="off"
+                    >
+
+                    <button
+                        id="togglePassword"
+                        type="button"
+                    >
+                        👁
+                    </button>
+
+                </div>
+
+
+                <!-- STRENGTH BAR -->
+
+                <div class="meter">
+                    <div id="strengthBar"></div>
+                </div>
+
+
+                <div class="strength-info">
+
+                    <span>
+                        Password strength
+                    </span>
+
+                    <strong id="strengthText">
+                        Waiting...
+                    </strong>
+
+                </div>
+
+            </div>
+
+
+            <!-- RESULTS -->
+
+            <div class="result-grid">
+
+
+                <!-- SCORE CARD -->
+
+                <div class="score-card">
+
+                    <div class="card-header">
+
+                        <div>
+
+                            <div class="card-title">
+                                SECURITY SCORE
+                            </div>
+
+                            <span class="card-subtitle">
+                                Overall password security
+                            </span>
+
+                        </div>
+
+                        <div class="shield-icon">
+                            🛡
+                        </div>
+
+                    </div>
+
+
+                    <div class="score-circle">
+
+                        <div class="score-content">
+
+                            <strong id="score">
+                                0
+                            </strong>
+
+                            <small>
+                                /100
+                            </small>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="security-status">
+
+                        <span
+                            class="status-indicator"
+                            id="statusIndicator"
+                        ></span>
+
+                        <strong id="securityLevel">
+                            WAITING
+                        </strong>
+
+                    </div>
+
+
+                    <p
+                        class="score-message"
+                        id="scoreMessage"
+                    >
+                        Enter a password to begin analysis.
+                    </p>
+
+
+                    <div class="score-stats">
+
+                        <div class="stat">
+
+                            <span>
+                                Complexity
+                            </span>
+
+                            <strong id="complexity">
+                                --
+                            </strong>
+
+                        </div>
+
+
+                        <div class="stat">
+
+                            <span>
+                                Length
+                            </span>
+
+                            <strong id="passwordLength">
+                                0
+                            </strong>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- REQUIREMENTS -->
+
+                <div class="requirements">
+
+                    <div class="card-header">
+
+                        <div>
+
+                            <div class="card-title">
+                                PASSWORD REQUIREMENTS
+                            </div>
+
+                            <span class="card-subtitle">
+                                Security criteria
+                            </span>
+
+                        </div>
+
+
+                        <div class="requirement-count">
+
+                            <span id="requirementCount">
+                                0
+                            </span>
+
+                            /6
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- LENGTH -->
+
+                    <div
+                        class="requirement"
+                        id="length"
+                    >
+
+                        <span class="check">
+                            ✓
+                        </span>
+
+                        <div class="requirement-info">
+
+                            <strong>
+                                At least 8 characters
+                            </strong>
+
+                            <span>
+                                Minimum password length
+                            </span>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- UPPERCASE -->
+
+                    <div
+                        class="requirement"
+                        id="uppercase"
+                    >
+
+                        <span class="check">
+                            ✓
+                        </span>
+
+                        <div class="requirement-info">
+
+                            <strong>
+                                Uppercase letter
+                            </strong>
+
+                            <span>
+                                Contains A–Z
+                            </span>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- LOWERCASE -->
+
+                    <div
+                        class="requirement"
+                        id="lowercase"
+                    >
+
+                        <span class="check">
+                            ✓
+                        </span>
+
+                        <div class="requirement-info">
+
+                            <strong>
+                                Lowercase letter
+                            </strong>
+
+                            <span>
+                                Contains a–z
+                            </span>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- NUMBER -->
+
+                    <div
+                        class="requirement"
+                        id="number"
+                    >
+
+                        <span class="check">
+                            ✓
+                        </span>
+
+                        <div class="requirement-info">
+
+                            <strong>
+                                Number
+                            </strong>
+
+                            <span>
+                                Contains 0–9
+                            </span>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- SPECIAL -->
+
+                    <div
+                        class="requirement"
+                        id="special"
+                    >
+
+                        <span class="check">
+                            ✓
+                        </span>
+
+                        <div class="requirement-info">
+
+                            <strong>
+                                Special character
+                            </strong>
+
+                            <span>
+                                Contains ! @ # $ % etc.
+                            </span>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- SPACES -->
+
+                    <div
+                        class="requirement"
+                        id="space"
+                    >
+
+                        <span class="check">
+                            ✓
+                        </span>
+
+                        <div class="requirement-info">
+
+                            <strong>
+                                No spaces
+                            </strong>
+
+                            <span>
+                                Password contains no spaces
+                            </span>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- PRIVACY -->
+
+        <div class="privacy">
+
+            🔒
+
+            <strong>
+                Privacy First
+            </strong>
+
+            — Your password is analyzed locally in your
+            browser and is never stored.
+
+        </div>
+
+    </main>
+
+
+    <!-- FOOTER -->
+
+    <footer>
+
+        © 2026 PasswordGuard
+        • Cybersecurity Learning Project
+
+    </footer>
+
+
+    <!-- JAVASCRIPT -->
+
+    <script>
+
+        const password =
+            document.getElementById("password");
+
+        const togglePassword =
+            document.getElementById("togglePassword");
+
+        const strengthBar =
+            document.getElementById("strengthBar");
+
+        const strengthText =
+            document.getElementById("strengthText");
+
+        const scoreElement =
+            document.getElementById("score");
+
+        const scoreMessage =
+            document.getElementById("scoreMessage");
+
+        const securityLevel =
+            document.getElementById("securityLevel");
+
+        const statusIndicator =
+            document.getElementById("statusIndicator");
+
+        const complexity =
+            document.getElementById("complexity");
+
+        const passwordLength =
+            document.getElementById("passwordLength");
+
+        const requirementCount =
+            document.getElementById("requirementCount");
+
+
+        /* SHOW / HIDE PASSWORD */
+
+        togglePassword.addEventListener(
+            "click",
+            function () {
+
+                if (
+                    password.type === "password"
+                ) {
+
+                    password.type = "text";
+
+                    togglePassword.textContent =
+                        "🙈";
+
+                } else {
+
+                    password.type = "password";
+
+                    togglePassword.textContent =
+                        "👁";
+
+                }
+
+            }
+        );
+
+
+        /* PASSWORD ANALYSIS */
+
+        password.addEventListener(
+            "input",
+            function () {
+
+                const value =
+                    password.value;
+
+
+                /* CONDITIONS */
+
+                const hasLength =
+                    value.length >= 8;
+
+                const hasUppercase =
+                    /[A-Z]/.test(value);
+
+                const hasLowercase =
+                    /[a-z]/.test(value);
+
+                const hasNumber =
+                    /[0-9]/.test(value);
+
+                const hasSpecial =
+                    /[^A-Za-z0-9\s]/.test(value);
+
+                const hasNoSpaces =
+                    !/\s/.test(value);
+
+
+                /* UPDATE REQUIREMENTS */
+
+                updateRequirement(
+                    "length",
+                    hasLength
+                );
+
+                updateRequirement(
+                    "uppercase",
+                    hasUppercase
+                );
+
+                updateRequirement(
+                    "lowercase",
+                    hasLowercase
+                );
+
+                updateRequirement(
+                    "number",
+                    hasNumber
+                );
+
+                updateRequirement(
+                    "special",
+                    hasSpecial
+                );
+
+                updateRequirement(
+                    "space",
+                    hasNoSpaces
+                );
+
+
+                /* SCORE */
+
+                let score = 0;
+
+                if (hasLength)
+                    score += 20;
+
+                if (hasUppercase)
+                    score += 20;
+
+                if (hasLowercase)
+                    score += 20;
+
+                if (hasNumber)
+                    score += 20;
+
+                if (hasSpecial)
+                    score += 20;
+
+
+                if (!hasNoSpaces)
+                    score -= 10;
+
+
+                if (score < 0)
+                    score = 0;
+
+
+                /* REQUIREMENT COUNT */
+
+                let count = 0;
+
+                if (hasLength)
+                    count++;
+
+                if (hasUppercase)
+                    count++;
+
+                if (hasLowercase)
+                    count++;
+
+                if (hasNumber)
+                    count++;
+
+                if (hasSpecial)
+                    count++;
+
+                if (hasNoSpaces)
+                    count++;
+
+
+                requirementCount.textContent =
+                    count;
+
+
+                /* LENGTH */
+
+                passwordLength.textContent =
+                    value.length;
+
+
+                /* COMPLEXITY */
+
+                if (value.length === 0) {
+
+                    complexity.textContent =
+                        "--";
+
+                } else if (count <= 2) {
+
+                    complexity.textContent =
+                        "Low";
+
+                } else if (count <= 4) {
+
+                    complexity.textContent =
+                        "Medium";
+
+                } else {
+
+                    complexity.textContent =
+                        "High";
+
+                }
+
+
+                /* SCORE */
+
+                scoreElement.textContent =
+                    score;
+
+
+                /* STRENGTH */
+
+                updateStrength(score);
+
+            }
+        );
+
+
+        /* REQUIREMENT FUNCTION */
+
+        function updateRequirement(
+            id,
+            valid
+        ) {
+
+            const element =
+                document.getElementById(id);
+
+            if (valid) {
+
+                element.classList.add(
+                    "valid"
+                );
+
+            } else {
+
+                element.classList.remove(
+                    "valid"
+                );
+
+            }
+
+        }
+
+
+        /* STRENGTH FUNCTION */
+
+        function updateStrength(score) {
+
+            if (
+                password.value.length === 0
+            ) {
+
+                strengthBar.style.width =
+                    "0%";
+
+                strengthBar.style.background =
+                    "#334155";
+
+                strengthText.textContent =
+                    "Waiting...";
+
+                strengthText.style.color =
+                    "#64748b";
+
+                securityLevel.textContent =
+                    "WAITING";
+
+                securityLevel.style.color =
+                    "#64748b";
+
+                statusIndicator.style.background =
+                    "#64748b";
+
+                statusIndicator.style.boxShadow =
+                    "none";
+
+                scoreMessage.textContent =
+                    "Enter a password to begin analysis.";
+
+                return;
+            }
+
+
+            strengthBar.style.width =
+                score + "%";
+
+
+            if (score < 40) {
+
+                /* WEAK */
+
+                strengthBar.style.background =
+                    "#ef4444";
+
+                strengthText.textContent =
+                    "Weak";
+
+                strengthText.style.color =
+                    "#ef4444";
+
+                securityLevel.textContent =
+                    "WEAK";
+
+                securityLevel.style.color =
+                    "#ef4444";
+
+                statusIndicator.style.background =
+                    "#ef4444";
+
+                statusIndicator.style.boxShadow =
+                    "0 0 10px rgba(239,68,68,0.7)";
+
+                scoreMessage.textContent =
+                    "Your password needs stronger security.";
+
+            }
+
+            else if (score < 80) {
+
+                /* MEDIUM */
+
+                strengthBar.style.background =
+                    "#f59e0b";
+
+                strengthText.textContent =
+                    "Medium";
+
+                strengthText.style.color =
+                    "#f59e0b";
+
+                securityLevel.textContent =
+                    "MEDIUM";
+
+                securityLevel.style.color =
+                    "#f59e0b";
+
+                statusIndicator.style.background =
+                    "#f59e0b";
+
+                statusIndicator.style.boxShadow =
+                    "0 0 10px rgba(245,158,11,0.7)";
+
+                scoreMessage.textContent =
+                    "Good start, but your password can be stronger.";
+
+            }
+
+            else {
+
+                /* STRONG */
+
+                strengthBar.style.background =
+                    "#22c55e";
+
+                strengthText.textContent =
+                    "Strong";
+
+                strengthText.style.color =
+                    "#22c55e";
+
+                securityLevel.textContent =
+                    "STRONG";
+
+                securityLevel.style.color =
+                    "#22c55e";
+
+                statusIndicator.style.background =
+                    "#22c55e";
+
+                statusIndicator.style.boxShadow =
+                    "0 0 10px rgba(34,197,94,0.7)";
+
+                scoreMessage.textContent =
+                    "Your password meets the basic security requirements.";
+
+            }
+
+        }
+
+    </script>
+
+</body>
+</html>
